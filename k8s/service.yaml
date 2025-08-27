@@ -3,9 +3,9 @@ kind: Service
 metadata:
   name: java-k8s-demo
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     app: java-k8s-demo
   ports:
     - port: 80
-      targetPort: 8080
+      targetPort: 8088

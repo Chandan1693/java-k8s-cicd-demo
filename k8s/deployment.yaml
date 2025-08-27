@@ -14,20 +14,24 @@ spec:
       labels:
         app: java-k8s-demo
     spec:
+      imagePullSecrets:
+        - name: dockerhub-cred
       containers:
         - name: app
-          image: chandan1693/java-k8s-demo:latest
+          image: chand93/java-k8s-demo:dev   # or :v1 if you pushed it
+          imagePullPolicy: IfNotPresent         # avoids unnecessary pulls
           ports:
-            - containerPort: 8080
+            - containerPort: 8088
           readinessProbe:
             httpGet:
               path: /health
-              port: 8080
+              port: 8088
             initialDelaySeconds: 5
             periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /health
-              port: 8080
+              port: 8088
             initialDelaySeconds: 10
             periodSeconds: 20
+

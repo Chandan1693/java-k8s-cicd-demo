@@ -43,18 +43,18 @@ pipeline {
       steps { waitForQualityGate abortPipeline: true, credentialsId: 'sonar-token' }
     }
     stage('Build Image') {
-      steps { sh 'docker build -t chandan1693/java-k8s-demo:${BUILD_NUMBER} .' }
+      steps { sh 'docker build -t chand93/java-k8s-demo:${BUILD_NUMBER} .' }
     }
     stage('Image Scan (Trivy)') {
       when { expression { return false } } // enable on Day 6
-      steps { sh 'trivy image --exit-code 0 --format table -o trivy-image-report.html chandan1693/java-k8s-demo:${BUILD_NUMBER}' }
+      steps { sh 'trivy image --exit-code 0 --format table -o trivy-image-report.html chand93/java-k8s-demo:${BUILD_NUMBER}' }
     }
     stage('Push Image') {
       steps {
         withDockerRegistry(credentialsId: 'docker-cred') {
-          sh 'docker push chandan1693/java-k8s-demo:${BUILD_NUMBER}'
-          sh 'docker tag chandan1693/java-k8s-demo:${BUILD_NUMBER} chandan1693/java-k8s-demo:latest'
-          sh 'docker push chandan1693/java-k8s-demo:latest'
+          sh 'docker push chand93/java-k8s-demo:${BUILD_NUMBER}'
+          sh 'docker tag chand93/java-k8s-demo:${BUILD_NUMBER} chand93/java-k8s-demo:latest'
+          sh 'docker push chand93/java-k8s-demo:latest'
         }
       }
     }
