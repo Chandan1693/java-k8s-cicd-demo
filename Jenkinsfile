@@ -1,23 +1,41 @@
 pipeline {
   agent any
   options { timestamps() }
+
   environment {
     DOCKER_IMAGE = 'chand93/java-k8s-demo'
     DOCKER_TAG   = "${env.BUILD_NUMBER}"
   }
+
   stages {
     stage('Checkout') {
-      steps { git branch: 'main', url: 'https://github.com/Chandan1693/java-k8s-cicd-demo.git' }
+      steps {
+        // The automatic "Declarative: Checkout SCM" already checked out the repo.
+        // If you prefer, you can remove this stage entirely.
+        checkout scm
+      }
     }
+
     stage('Build & Test') {
-      steps { sh './app/mvnw -B -f app/pom.xml clean verify' }
-      post { always { junit 'app/target/surefire-reports/*.xml' } }
+      steps {
+        dir('app') {
+          sh 'chmod +x mvnw'
+          sh './mvnw -B clean verify'
+        }
+      }
+      post {
+        // Our demo has no tests yet, so don't fail the build if no reports
+        always { junit allowEmptyResults: true, testResults: 'app/target/surefire-reports/*.xml' }
+      }
     }
+
     stage('Build Image') {
-      steps { sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -t ${DOCKER_IMAGE}:latest ." }
+      steps {
+        sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -t ${DOCKER_IMAGE}:latest ."
+      }
     }
+
     stage('Push Image') {
-      when { expression { return true } }
       steps {
         withDockerRegistry(credentialsId: 'docker-cred') {
           sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
@@ -25,6 +43,7 @@ pipeline {
         }
       }
     }
+
     stage('Deploy to K8s') {
       steps {
         withKubeConfig(credentialsId: 'k8s-kubeconfig') {
