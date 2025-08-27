@@ -4,7 +4,7 @@ End-to-end pipeline that builds, tests, scans, containers, and deploys a Java (S
 
 ## Quick start
 - Build locally: `cd app && ./mvnw clean verify`
-- Run locally: `./mvnw spring-boot:run` then open http://localhost:8080/health
+- Run locally: `./mvnw spring-boot:run` then open http://localhost:8088/health
 - Docker build: `docker build -t chand93/java-k8s-demo:latest .`
 - K8s apply: `kubectl apply -f k8s/`
 
